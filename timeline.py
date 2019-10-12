@@ -23,6 +23,7 @@ def getEveryDayTimeline(dirPath):
     
     # 建立一天有 86400 秒的  陣列為 timeline
     timelineEveryDay = np.zeros((86401))
+    count = 1
     for fileName in files:
         print("start: "+str(fileName))
         if allowed_file(fileName) :
@@ -46,8 +47,10 @@ def getEveryDayTimeline(dirPath):
                 sect=int(t[6:])
                 t=(hourt+mint+sect)
                 # 以每秒紀錄;0表示沒有在使用手機的時間，1 為有在使用手機的時間
-                timelineEveryDay[f-1:t] += 1.0
-    return np.true_divide(timelineEveryDay,49)
+                timelineEveryDay[f-1:t] += 1.0 * (count / 1596)
+            count += 1
+    print(count)
+    return timelineEveryDay
         
 def getWeekTimeline(dirPath , day):
  # 取得檔案列表
@@ -58,6 +61,7 @@ def getWeekTimeline(dirPath , day):
     
     # 建立一天有 86400 秒的 int 陣列為 timeline
     timelineWeek = np.zeros((86401))
+    countWeek = 1
     for fileName in files:
         if allowed_file(fileName) and allowed_file_Week(fileName , day) :
             print("start: "+str(fileName))
@@ -80,10 +84,12 @@ def getWeekTimeline(dirPath , day):
                 mint=int(t[3:5])*60
                 sect=int(t[6:])
                 t=(hourt+mint+sect)
-                # 以每秒紀錄;0表示沒有在使用手機的時間，1 為有在使用手機的時間
-                timelineWeek[f-1:t] += 1.0
+                timelineWeek[f-1:t] += 1.0 * (countWeek / 28) 
+            countWeek += 1
+            print(countWeek)
 
-    return np.true_divide(timelineWeek,7)
+
+    return timelineWeek
 # 計算結果
 def predictUsePhone(timelineList):
     timelineNextWeek = []
@@ -91,8 +97,9 @@ def predictUsePhone(timelineList):
     for i in range(7):
         timelineNextWeek.append(np.zeros((86401)))
         for second in range(86400):
-            ratio = timelineList[0][second] * 0.3 + timelineList[i+1][second] * 0.7
+            ratio = timelineList[0][second] * 0.4 + timelineList[i+1][second] * 0.6
             if ratio > threshold :
+                print("y:" + str(ratio))
                 ratio = 1
 
             else:
